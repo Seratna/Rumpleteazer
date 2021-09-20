@@ -1,0 +1,7 @@
+[submodule "mmdetection"]
+	path = mmdetection
+	url = ./mmdetection
+
+[submodule "mmpose"]
+	path = mmpose
+	url = ./mmpose
