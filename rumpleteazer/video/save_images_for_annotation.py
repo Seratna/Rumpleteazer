@@ -1,18 +1,15 @@
 from itertools import count
 from pathlib import Path
 from datetime import datetime
+import logging
 
 import cv2 as cv
 
-from rumpleteazer.util.logging import get_logger
 
-logger = get_logger(name=__name__)
-
-
-def save_images_for_annotation(output_dir: str, saving=False):
+def save_images_for_annotation(output_dir: str, auto_save=False):
     capture = cv.VideoCapture(0)
     if not capture.isOpened():
-        logger.error('could not open video capture')
+        logging.error('could not open video capture')
         exit()
 
     capture.set(cv.CAP_PROP_FRAME_WIDTH, 1920)
@@ -22,18 +19,21 @@ def save_images_for_annotation(output_dir: str, saving=False):
         # Capture frame-by-frame
         successful, frame = capture.read()
         if not successful:
-            logger.error('failed to get frame. Exiting ...')
+            logging.error('failed to get frame. Exiting ...')
             break
 
-        # save image
-        if saving and i % 300 == 0:
-            file_path = str(Path(output_dir, f'{datetime.now().isoformat()}.png'))
-            cv.imwrite(file_path, frame)
-            logger.info(f'saved image to {file_path}')
-
+        # display
         cv.imshow('frame', frame)
+
         if cv.waitKey(1) == ord('q'):
+            # quit
             break
+        elif (cv.waitKey(1) == ord('s')) or (auto_save and (i % 120 == 0)):
+            # save image
+            file_path = str(Path(output_dir,
+                                 f'{datetime.now().isoformat().replace(":", "-")}.png'))
+            cv.imwrite(file_path, frame)
+            logging.info(f'saved image to {file_path}')
 
     # When everything done, release the capture
     capture.release()
@@ -41,7 +41,8 @@ def save_images_for_annotation(output_dir: str, saving=False):
 
 
 def main():
-    save_images_for_annotation(output_dir='/home/antares/temp', saving=True)
+    save_images_for_annotation(output_dir='/home/antares/temp',
+                               auto_save=False)
 
 
 if __name__ == '__main__':
