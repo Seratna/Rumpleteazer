@@ -25,10 +25,11 @@ def save_images_for_annotation(output_dir: str, auto_save=False):
         # display
         cv.imshow('frame', frame)
 
-        if cv.waitKey(1) == ord('q'):
+        key = cv.waitKey(1)
+        if key == ord('q'):
             # quit
             break
-        elif (cv.waitKey(1) == ord('s')) or (auto_save and (i % 120 == 0)):
+        elif (key == ord('s')) or (auto_save and (i % 120 == 0)):
             # save image
             file_path = str(Path(output_dir,
                                  f'{datetime.now().isoformat().replace(":", "-")}.png'))
@@ -41,9 +42,10 @@ def save_images_for_annotation(output_dir: str, auto_save=False):
 
 
 def main():
-    save_images_for_annotation(output_dir='/home/antares/temp',
+    save_images_for_annotation(output_dir='/Users/Antares/Documents/data/overwatch',
                                auto_save=False)
 
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO)
     main()
