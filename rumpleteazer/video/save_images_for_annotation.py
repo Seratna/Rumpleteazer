@@ -32,7 +32,7 @@ def save_images_for_annotation(output_dir: str, auto_save=False):
         elif (key == ord('s')) or (auto_save and (i % 120 == 0)):
             # save image
             file_path = str(Path(output_dir,
-                                 f'{datetime.now().isoformat().replace(":", "-")}.png'))
+                                 f'{datetime.now().isoformat().replace(":", "-")}.bmp'))
             cv.imwrite(file_path, frame)
             logging.info(f'saved image to {file_path}')
 
