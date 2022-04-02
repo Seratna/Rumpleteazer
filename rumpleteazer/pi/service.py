@@ -6,6 +6,7 @@ import struct
 from collections import deque
 from threading import Thread
 import logging
+import math
 
 from rumpleteazer.util.logging import get_logger
 
@@ -17,26 +18,40 @@ def distance(point):
     return (dx ** 2 + dy ** 2) ** 0.5
 
 
+def sigmoid(x):
+    return 1 / (1 + math.exp(-x))
+
+
+def make_sigmoid_sequence(d: int, n: int):
+    steps = []
+
+    cumulated = 0
+
+    for i in range(1, n+1, 1):  # [1, n]
+        x = (i / n) * 14 - 7  # map to [-10, 10]
+        s = sigmoid(x) * d  # (0, d)
+        s = int(round(s))
+        step = s - cumulated
+        steps.append(min(step, 5))  # clamp step to 5
+        cumulated += step
+
+    sum_steps = sum(steps)
+    if sum_steps < d:
+        adjustment = make_sigmoid_sequence(d-sum_steps, n)
+        steps = [sum(t) for t in zip(steps, adjustment)]
+
+    assert sum(steps) == d
+
+    return steps
+
+
 def make_sequence(dx, dy):
-    sequence = []
+    n = max(dx, dy) / 5
 
-    n = max(dx, dy)
-    cx = 0  # cumulate
-    cy = 0
+    sequence_x = make_sigmoid_sequence(dx, n)
+    sequence_y = make_sigmoid_sequence(dy, n)
 
-    for i in range(1, n+1, 1):
-        step_x = int(dx * (i/n)) - cx
-        step_y = int(dy * (i/n)) - cy
-        sequence.append((step_x, step_y))
-        cx += step_x
-        cy += step_y
-
-    sequence.append((dx - cx, dy - cy))
-
-    assert sum(x for x, y in sequence) == dx
-    assert sum(y for x, y in sequence) == dy
-
-    return sequence
+    return list(zip(sequence_x, sequence_y))
 
 
 def man_in_the_middle():
@@ -110,8 +125,8 @@ def man_in_the_middle():
                     out_file.flush()
                 else:
                     x, y = min(data, key=lambda p: distance(p))
-                    dx = x - 960
-                    dy = y - 540
+                    dx = int(round(x - 960))
+                    dy = int(round(y - 540))
                     sequence = make_sequence(dx, dy)
 
                     for i, (step_x, step_y) in enumerate(sequence, start=1):
