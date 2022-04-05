@@ -36,7 +36,7 @@ def make_sigmoid_sequence(d: int, n: int):
         cumulated += step
 
     sum_steps = sum(steps)
-    if sum_steps < d:
+    if sum_steps != d:
         adjustment = make_sigmoid_sequence(d-sum_steps, n)
         steps = [sum(t) for t in zip(steps, adjustment)]
 
@@ -46,7 +46,7 @@ def make_sigmoid_sequence(d: int, n: int):
 
 
 def make_sequence(dx, dy):
-    n = max(dx, dy) // 5
+    n = max(abs(dx), abs(dy)) // 5
 
     sequence_x = make_sigmoid_sequence(dx, n)
     sequence_y = make_sigmoid_sequence(dy, n)
@@ -86,10 +86,16 @@ def man_in_the_middle():
             return
 
     def _start_server():
-        _host = '127.0.0.1'
+        _host = '192.168.0.19'
+        _local_host = '127.0.0.1'
         _port = 7777
-        _server = HTTPServer((_host, _port), _RequestHandler)
-        logger.info(f'Server started http://{_host}:{_port}')
+
+        try:
+            _server = HTTPServer((_host, _port), _RequestHandler)
+            logger.info(f'Server started http://{_host}:{_port}')
+        except OSError:
+            _server = HTTPServer((_local_host, _port), _RequestHandler)
+            logger.info(f'Server started http://{_local_host}:{_port}')
 
         try:
             _server.serve_forever()
