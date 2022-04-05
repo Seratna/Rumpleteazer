@@ -47,6 +47,7 @@ def make_sigmoid_sequence(d: int, n: int):
 
 def make_sequence(dx, dy):
     n = max(abs(dx), abs(dy)) // 5
+    n = max(n, 1)  # make sure a > 0
 
     sequence_x = make_sigmoid_sequence(dx, n)
     sequence_y = make_sigmoid_sequence(dy, n)
@@ -150,7 +151,8 @@ def man_in_the_middle():
 
 
 def main():
-    man_in_the_middle()
+    # man_in_the_middle()
+    make_sigmoid_sequence(-5, 0)
 
 
 if __name__ == '__main__':
