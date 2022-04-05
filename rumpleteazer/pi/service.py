@@ -151,8 +151,7 @@ def man_in_the_middle():
 
 
 def main():
-    # man_in_the_middle()
-    make_sigmoid_sequence(-5, 0)
+    man_in_the_middle()
 
 
 if __name__ == '__main__':
